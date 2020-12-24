@@ -1,82 +1,55 @@
 include pfarquim.asm
-
+;==============================================MACROS
+; Imprime el Texto que Recibe
+Mostrar macro texto
+    mov ax, seg texto
+    mov ds,ax
+	mov ah, 09h
+	mov dx, offset texto 
+	int 21h
+endm
 
 .model small
-.stack 100h
-
-;--------------------- seccion de datos
-
+.stack
 .data
+   saludo   db "Hola Mundo", "$"
+    MenuP db ' MENU PRINCIPAL PROYECTO FINAL',0ah,0dh,' ',0ah,0dh,' 1) Ingresar',0ah,0dh,' 2) Registrar',0ah,0dh,' 3) Salir',0ah,0dh,'$'
+    MenuI db 'Ingrese los siguietes datos: ',0ah,0dh,' Usuario: ','$'
+    MenuI2 db 0ah,0dh,' Contrasena: ','$'
 
-;variables menu
-; menu primero
-opcion      db  0ah, 0dh, 'Ingrese una opcion para entrar...', '$'
-opcion1     db 0ah, 0dh, '1....... Ingresar', '$'
-opcion2     db 0ah, 0dh, '2....... Registrar', '$'
-opcion3     db 0ah, 0dh, '3....... Salir', '$'
+.code
 
+Menu_Principal proc near
+	mov ax, @data
+	mov ds,ax
+	Mostrar MenuP
 
-; menu ingresar
+    getChar
+    cmp al, 49  ; 1
+    je MenuIngresar
 
-ingreseUsuario     db 0ah, 0dh, 'Ingrese su Usuario: ', '$'
-ingresePass        db 0ah, 0dh, 'Ingrese su Password: ', '$'
+    cmp al, 50
+    je Menu_Principal
 
+    cmp al, 51
+    je Salir
+    jmp Menu_Principal
 
-; posibles errores
-errorUno        db 0ah, 0dh, 'Usuario o contrasenia no existen', '$'
-errorDos        db 0ah, 0dh, 'Este usuario ya existe', '$'
+Menu_Principal endp
 
-; variables manejo de archivos
+MenuIngresar proc near
+	mov ax, @data
+	mov ds,ax
+	Mostrar MenuI
+    jmp Salir
 
-rutaUsuarios        db 'usuarios.txt', 00h
+MenuIngresar endp
 
-
-;variables admin
-
-usrAdmin    db  'admin'
-passAdmin   db  '1234'
-
-; ------------------------- CODIGO 
-
-.code 
-
-main proc
-    Menu: 
-        print opcion
-        print opcion1
-        print opcion2
-        print opcion3
-
-        getChar
-
-        ; aqui vamos a ver que opcion selecciona el usuario
-
-        cmp al, 49  ; 1
-        je MenuIngresar
-
-        cmp al, 50
-        je MenuRegistrar
-
-        cmp al, 51
-        je Salir
-        jmp Menu
+Salir proc near
+    mov ah, 4ch
+    int 21h 
+Salir endp
 
 
-    
-    MenuIngresar:
-        print ingreseUsuario
-        getChar
-        print ingresePass
-        getChar
-    
-    MenuRegistrar:
-        getChar
-        mov ah, 4ch
-        int 21h
 
-    Salir: 
-        mov ah, 4ch
-        int 21h
-
-main endp
-end main
+end
